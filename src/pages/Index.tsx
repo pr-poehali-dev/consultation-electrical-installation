@@ -1,102 +1,142 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
 
 const Index = () => {
-  const [roomArea, setRoomArea] = useState('');
-  const [serviceType, setServiceType] = useState('');
-  const [complexity, setComplexity] = useState('');
-  const [totalCost, setTotalCost] = useState(0);
-
-  const services = [
+  const consultationPackages = [
     {
-      icon: 'Zap',
-      title: 'Проектирование электросетей',
-      description: 'Разработка полного проекта электроснабжения для квартир, домов и коммерческих помещений',
-      price: 'от 5 000 ₽'
-    },
-    {
-      icon: 'Home',
-      title: 'Электромонтаж в квартире',
-      description: 'Консультация по электромонтажу в жилых помещениях: розетки, освещение, автоматика',
-      price: 'от 3 000 ₽'
-    },
-    {
-      icon: 'Building2',
-      title: 'Коммерческий электромонтаж',
-      description: 'Консультации по электроснабжению офисов, магазинов и производственных объектов',
-      price: 'от 8 000 ₽'
+      icon: 'MessageSquare',
+      title: 'Базовая консультация',
+      duration: '30 минут',
+      description: 'Ответы на вопросы по электромонтажу, общие рекомендации',
+      features: [
+        'Видеосвязь или телефон',
+        'Ответы на 3-5 вопросов',
+        'Общие рекомендации',
+        'Запись консультации'
+      ],
+      basePrice: 1500,
+      category: 'basic'
     },
     {
       icon: 'FileText',
-      title: 'Экспертиза проектов',
-      description: 'Проверка готовых проектов на соответствие нормам и стандартам безопасности',
-      price: 'от 4 000 ₽'
+      title: 'Разбор проекта',
+      duration: '60 минут',
+      description: 'Детальный анализ вашего проекта или схемы электромонтажа',
+      features: [
+        'Видеоконференция',
+        'Анализ схем и чертежей',
+        'Выявление ошибок',
+        'Письменные рекомендации',
+        'Повторная связь в течение недели'
+      ],
+      basePrice: 3500,
+      category: 'standard'
     },
     {
-      icon: 'Shield',
-      title: 'Аудит электробезопасности',
-      description: 'Оценка существующих электросетей и рекомендации по улучшению безопасности',
-      price: 'от 6 000 ₽'
+      icon: 'ShieldCheck',
+      title: 'Экспертная оценка',
+      duration: '90 минут',
+      description: 'Полная экспертиза с расчетами и детальным отчетом',
+      features: [
+        'Видеоконференция',
+        'Анализ всей документации',
+        'Расчет нагрузок',
+        'Проверка по нормам ПУЭ',
+        'Развернутый отчет PDF',
+        'Поддержка 2 недели'
+      ],
+      basePrice: 6000,
+      category: 'premium'
     },
     {
-      icon: 'Lightbulb',
-      title: 'Консультация онлайн',
-      description: 'Удаленная консультация по видеосвязи с разбором чертежей и схем',
-      price: 'от 2 000 ₽'
+      icon: 'Wrench',
+      title: 'Помощь в монтаже',
+      duration: '45 минут',
+      description: 'Консультация в процессе выполнения работ',
+      features: [
+        'Видеосвязь в реальном времени',
+        'Подсказки по ходу работы',
+        'Советы по инструментам',
+        'Проверка результата'
+      ],
+      basePrice: 2500,
+      category: 'basic'
+    },
+    {
+      icon: 'Calculator',
+      title: 'Расчет сметы',
+      duration: '60 минут',
+      description: 'Помощь в расчете стоимости материалов и работ',
+      features: [
+        'Видеоконференция',
+        'Подбор материалов',
+        'Расчет количества',
+        'Смета в Excel',
+        'Советы по оптимизации'
+      ],
+      basePrice: 4000,
+      category: 'standard'
+    },
+    {
+      icon: 'GraduationCap',
+      title: 'Обучающая сессия',
+      duration: '120 минут',
+      description: 'Подробное обучение основам электромонтажа',
+      features: [
+        'Видеоконференция',
+        'Теория и практика',
+        'Разбор кейсов',
+        'Обучающие материалы',
+        'Сертификат участника',
+        'Доступ к записи'
+      ],
+      basePrice: 7500,
+      category: 'premium'
     }
   ];
 
-  const calculateCost = () => {
-    let baseCost = 0;
+  const [selectedCards, setSelectedCards] = useState<{[key: number]: {urgency: string, complexity: string, price: number}}>({});
+
+  const calculatePrice = (basePrice: number, urgency: string, complexity: string) => {
+    let price = basePrice;
     
-    switch(serviceType) {
-      case 'design':
-        baseCost = 5000;
-        break;
-      case 'apartment':
-        baseCost = 3000;
-        break;
-      case 'commercial':
-        baseCost = 8000;
-        break;
-      case 'expertise':
-        baseCost = 4000;
-        break;
-      case 'audit':
-        baseCost = 6000;
-        break;
-      case 'online':
-        baseCost = 2000;
-        break;
-      default:
-        baseCost = 0;
-    }
-
-    const area = parseFloat(roomArea) || 0;
-    const areaCost = area * 100;
-
-    let complexityMultiplier = 1;
-    switch(complexity) {
-      case 'low':
-        complexityMultiplier = 1;
-        break;
-      case 'medium':
-        complexityMultiplier = 1.5;
-        break;
-      case 'high':
-        complexityMultiplier = 2;
-        break;
-    }
-
-    const materialsCost = area * 50;
-    const total = (baseCost + areaCost + materialsCost) * complexityMultiplier;
+    if (urgency === 'urgent') price *= 1.5;
+    if (urgency === 'express') price *= 2;
     
-    setTotalCost(Math.round(total));
+    if (complexity === 'medium') price *= 1.3;
+    if (complexity === 'high') price *= 1.7;
+    
+    return Math.round(price);
+  };
+
+  const updateCardCalculation = (index: number, urgency: string, complexity: string, basePrice: number) => {
+    const price = calculatePrice(basePrice, urgency, complexity);
+    setSelectedCards({
+      ...selectedCards,
+      [index]: { urgency, complexity, price }
+    });
+  };
+
+  const getCategoryColor = (category: string) => {
+    switch(category) {
+      case 'basic': return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'standard': return 'bg-purple-100 text-purple-700 border-purple-200';
+      case 'premium': return 'bg-amber-100 text-amber-700 border-amber-200';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const getCategoryName = (category: string) => {
+    switch(category) {
+      case 'basic': return 'Базовый';
+      case 'standard': return 'Стандарт';
+      case 'premium': return 'Премиум';
+      default: return '';
+    }
   };
 
   return (
@@ -105,121 +145,151 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Icon name="Zap" className="text-primary" size={32} />
-            <h1 className="text-2xl font-heading font-bold">ЭлектроКонсалт</h1>
+            <h1 className="text-2xl font-heading font-bold">ЭлектроКонсалт Онлайн</h1>
           </div>
-          <Button>Связаться с нами</Button>
+          <Button>Забронировать консультацию</Button>
         </div>
       </header>
 
-      <section className="container mx-auto px-4 py-20">
+      <section className="container mx-auto px-4 py-16">
         <div className="text-center max-w-3xl mx-auto mb-16 animate-fade-in">
           <h2 className="text-5xl font-heading font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Консультации по электромонтажу
+            Онлайн-консультации по электромонтажу
           </h2>
           <p className="text-xl text-muted-foreground">
-            Профессиональные консультации по проектированию и монтажу электрических сетей. 
-            Безопасность, качество и соответствие стандартам.
+            Получите профессиональную консультацию, не выходя из дома. 
+            Выберите пакет услуг и рассчитайте стоимость с учетом ваших требований.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
-          {services.map((service, index) => (
-            <Card 
-              key={index} 
-              className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 animate-scale-in border-2"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <CardHeader>
-                <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <Icon name={service.icon} className="text-primary" size={28} />
-                </div>
-                <CardTitle className="font-heading">{service.title}</CardTitle>
-                <CardDescription className="text-base">{service.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold text-primary">{service.price}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <Card className="max-w-4xl mx-auto shadow-2xl border-2 animate-fade-in">
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-heading mb-2">Калькулятор стоимости</CardTitle>
-            <CardDescription className="text-base">
-              Рассчитайте предварительную стоимость консультации и материалов
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="service" className="text-base font-medium">Тип услуги</Label>
-                <Select onValueChange={setServiceType}>
-                  <SelectTrigger id="service" className="h-12">
-                    <SelectValue placeholder="Выберите услугу" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="design">Проектирование электросетей</SelectItem>
-                    <SelectItem value="apartment">Электромонтаж в квартире</SelectItem>
-                    <SelectItem value="commercial">Коммерческий электромонтаж</SelectItem>
-                    <SelectItem value="expertise">Экспертиза проектов</SelectItem>
-                    <SelectItem value="audit">Аудит электробезопасности</SelectItem>
-                    <SelectItem value="online">Консультация онлайн</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="area" className="text-base font-medium">Площадь помещения (м²)</Label>
-                <Input
-                  id="area"
-                  type="number"
-                  placeholder="Введите площадь"
-                  value={roomArea}
-                  onChange={(e) => setRoomArea(e.target.value)}
-                  className="h-12"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="complexity" className="text-base font-medium">Сложность работ</Label>
-                <Select onValueChange={setComplexity}>
-                  <SelectTrigger id="complexity" className="h-12">
-                    <SelectValue placeholder="Выберите сложность" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Низкая</SelectItem>
-                    <SelectItem value="medium">Средняя</SelectItem>
-                    <SelectItem value="high">Высокая</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-end">
-                <Button 
-                  onClick={calculateCost} 
-                  className="w-full h-12 text-lg"
-                  disabled={!serviceType || !roomArea || !complexity}
-                >
-                  <Icon name="Calculator" className="mr-2" size={20} />
-                  Рассчитать
-                </Button>
-              </div>
-            </div>
-
-            {totalCost > 0 && (
-              <Card className="bg-primary/5 border-primary/20 animate-scale-in">
-                <CardContent className="pt-6">
-                  <div className="text-center">
-                    <p className="text-muted-foreground mb-2 text-lg">Предварительная стоимость</p>
-                    <p className="text-5xl font-bold text-primary font-heading">{totalCost.toLocaleString('ru-RU')} ₽</p>
-                    <p className="text-sm text-muted-foreground mt-4">
-                      * Итоговая стоимость может отличаться после детальной консультации
-                    </p>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {consultationPackages.map((pkg, index) => {
+            const cardData = selectedCards[index];
+            const hasCalculation = cardData && cardData.urgency && cardData.complexity;
+            
+            return (
+              <Card 
+                key={index} 
+                className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 animate-scale-in border-2 flex flex-col"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <CardHeader className="flex-grow">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Icon name={pkg.icon} className="text-primary" size={28} />
+                    </div>
+                    <Badge className={`${getCategoryColor(pkg.category)} border`}>
+                      {getCategoryName(pkg.category)}
+                    </Badge>
                   </div>
+                  
+                  <CardTitle className="font-heading text-xl mb-2">{pkg.title}</CardTitle>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Icon name="Clock" className="text-muted-foreground" size={16} />
+                    <span className="text-sm text-muted-foreground">{pkg.duration}</span>
+                  </div>
+                  <CardDescription className="text-base mb-4">{pkg.description}</CardDescription>
+                  
+                  <div className="space-y-2">
+                    {pkg.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-start gap-2">
+                        <Icon name="Check" className="text-primary mt-0.5 flex-shrink-0" size={16} />
+                        <span className="text-sm">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardHeader>
+
+                <CardContent className="space-y-4 border-t pt-6">
+                  <div className="text-center mb-4">
+                    <p className="text-sm text-muted-foreground mb-1">Базовая цена</p>
+                    <p className="text-3xl font-bold text-primary">{pkg.basePrice.toLocaleString('ru-RU')} ₽</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium mb-1.5 block">Срочность</label>
+                      <Select onValueChange={(value) => {
+                        const complexity = cardData?.complexity || '';
+                        if (complexity) updateCardCalculation(index, value, complexity, pkg.basePrice);
+                      }}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Выберите срочность" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="normal">Обычная (в течение недели)</SelectItem>
+                          <SelectItem value="urgent">Срочная (+50%)</SelectItem>
+                          <SelectItem value="express">Экспресс (+100%)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium mb-1.5 block">Сложность задачи</label>
+                      <Select onValueChange={(value) => {
+                        const urgency = cardData?.urgency || '';
+                        if (urgency) updateCardCalculation(index, urgency, value, pkg.basePrice);
+                      }}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Выберите сложность" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Низкая</SelectItem>
+                          <SelectItem value="medium">Средняя (+30%)</SelectItem>
+                          <SelectItem value="high">Высокая (+70%)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {hasCalculation && (
+                    <Card className="bg-primary/5 border-primary/20 animate-scale-in">
+                      <CardContent className="p-4">
+                        <div className="text-center">
+                          <p className="text-sm text-muted-foreground mb-1">Ваша стоимость</p>
+                          <p className="text-3xl font-bold text-primary">{cardData.price.toLocaleString('ru-RU')} ₽</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  <Button className="w-full" disabled={!hasCalculation}>
+                    <Icon name="Calendar" className="mr-2" size={18} />
+                    Записаться
+                  </Button>
                 </CardContent>
               </Card>
-            )}
+            );
+          })}
+        </div>
+
+        <Card className="mt-16 bg-secondary/10 border-secondary/20 animate-fade-in">
+          <CardContent className="p-8 text-center">
+            <Icon name="Info" className="mx-auto mb-4 text-primary" size={40} />
+            <h3 className="text-2xl font-heading font-bold mb-3">Как проходит консультация?</h3>
+            <div className="grid md:grid-cols-3 gap-6 mt-8 text-left">
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 font-bold">1</div>
+                <div>
+                  <h4 className="font-semibold mb-1">Выберите пакет</h4>
+                  <p className="text-sm text-muted-foreground">Укажите срочность и сложность для расчета точной стоимости</p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 font-bold">2</div>
+                <div>
+                  <h4 className="font-semibold mb-1">Забронируйте время</h4>
+                  <p className="text-sm text-muted-foreground">Выберите удобное время для видеоконсультации</p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 font-bold">3</div>
+                <div>
+                  <h4 className="font-semibold mb-1">Получите результат</h4>
+                  <p className="text-sm text-muted-foreground">Профессиональные рекомендации и материалы по итогам</p>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </section>
